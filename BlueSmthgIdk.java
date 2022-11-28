@@ -17,6 +17,14 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Autonomous(name = "Auto Blue Right", group = "")
 public class BlueSmthgIdk extends LinearOpMode {
 
+    //Cannot say new Pose2d for every trajectories start value. Instead, [previous Trajectory].end()
+    //.spineTo(new Vector2d(x1, y1), heading) for movement in Trajectories.
+    //Ex: .splineTo(new Vector2d(20, 9), Math.toRadians(45))
+    // .turn(heading); cannot be used in trajectories
+    //If you turn outside a trajectory, the .end statement will be incorrect so you should do something like: traj1.end().plus(new Pose2d(0, 0, Math.toRadians(90)))
+    //go backwards in a trajectory by adding a true after new Pose2d()
+    //ex: Trajectory trajectory = drive.trajectoryBuilder(new Pose2d(), true)
+    
     private Robot autoRobot;
     public void runOpMode() throws InterruptedException {
         autoRobot = new Robot(hardwareMap);

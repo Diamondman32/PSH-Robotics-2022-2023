@@ -1,22 +1,17 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
-import org.firstinspires.ftc.teamcode.drive.Robot;
+package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "Auto Blue Right", group = "")
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.drive.Robot;
+
+@Autonomous(name = "BlueAutoRight")
 public class BlueSmthgIdk extends LinearOpMode {
-
+    @Override
     //Cannot say new Pose2d for every trajectories start value. Instead, [previous Trajectory].end()
     //.spineTo(new Vector2d(x1, y1), heading) for movement in Trajectories.
     //Ex: .splineTo(new Vector2d(20, 9), Math.toRadians(45))
@@ -29,6 +24,17 @@ public class BlueSmthgIdk extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         autoRobot = new Robot(hardwareMap);
         waitForStart();
+        if (isStopRequested()) return;
+
+        while (autobot.frontDistanceSensor.getDistance(DistanceUnit.INCH) > 3 ){
+            autobot.driveTrainPower(0.3);
+        }
+        autobot.driveTrainPower(0);
+        sleep(1000);
+        int parkPos = autobot.detectColor();
+        telemetry.addData("Color", parkPos);
+        telemetry.update();
+        sleep(50000);
 
         autoRobot.setPoseEstimate(new Pose2d());
         //NOT BEING USED

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.personal;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 import org.firstinspires.ftc.teamcode.drive.Robot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;

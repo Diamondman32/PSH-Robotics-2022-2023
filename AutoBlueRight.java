@@ -9,9 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.Robot;
 
-/*
- * This is an example of a more complex path to really test the tuning.
- */
 @Autonomous(name = "BlueAutoRight")
 public class BlueAutoRight extends LinearOpMode {
     @Override
@@ -19,52 +16,42 @@ public class BlueAutoRight extends LinearOpMode {
         Robot autoRobot = new Robot(hardwareMap);
         waitForStart();
         if (isStopRequested()) return;
-        /*
-        while (autobot.frontDistanceSensor.getDistance(DistanceUnit.INCH) > 3 ){
-            autobot.driveTrainPower(0.3);
-        }
-        autobot.driveTrainPower(0);
-        sleep(1000);
-        int parkPos = autobot.detectColor();
-        telemetry.addData("Color", parkPos);
-        telemetry.update();
-        sleep(50000);
-        */
-
+        //Setting initial position of robot on coordinate plane
         Pose2d startPose = new Pose2d(-36, 72, Math.toRadians(270));
         autoRobot.setPoseEstimate(startPose);
 
+        //Building Trajectories
         Trajectory colorDetectTraj = autoRobot.trajectoryBuilder(startPose)
                 .forward(16.5)
                 .build();
+        Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-40, 12, Math.toRadians(330)))
+                .build();
+        Trajectory moveToCones = autoRobot.trajectoryBuilder(moveToStick.end())
+                .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                .build();
 
+        //Actions Begin
         autoRobot.followTrajectory(colorDetectTraj);
+        //Determining sleeve color and park value
         sleep(1000);
         int parkValue = autoRobot.detectColor();
         telemetry.addData("Color", parkValue);
         telemetry.update();
-
-        Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                .splineToSplineHeading(new Pose2d(-10, 25, Math.toRadians(330)), Math.toRadians(180))
-                //go forward pushing the Team Element out of the way; lining up to go between the sticks 12in
-                //swerve right to the tall stick
-                //turn towards tall stick 45ish degrees
-                //forward (closing in the rest of the way)
-                .build();
+        //Placing preloaded element
         autoRobot.followTrajectory(moveToStick);
-        autoRobot.turn(Math.toRadians(-135));
+            //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
+        //Placing second cone
+        autoRobot.followTrajectory(moveToCones);
+            //Code to pickup cone
+        //Going in reverse back to the pole GAVE AN ERROR WHEN TESTED TODAY HAVE NOT FIXED YET
+        autoRobot.followTrajectory(
+                autoRobot.trajectoryBuilder(moveToCones.end(), true)
+                        .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                        .build()
+        );
 
-        //PLACE ELEMENT ONCE LIFT IS DONE
-        Trajectory moveToCones = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                .splineToSplineHeading(new Pose2d(-10, 25, Math.toRadians(330)), Math.toRadians(180))
-                //go forward pushing the Team Element out of the way; lining up to go between the sticks 12in
-                //swerve right to the tall stick
-                //turn towards tall stick 45ish degrees
-                //forward (closing in the rest of the way)
-                .build();
-        autoRobot.followTrajectory(moveToStick);
-        
-  
+
         //maybe precision forward with distance sensor
         //autoRobot.liftToHeightEncoders(4,0.7);
         //autoRobot.openGrabber();

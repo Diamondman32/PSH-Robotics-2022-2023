@@ -1,0 +1,84 @@
+package org.firstinspires.ftc.teamcode.drive.opmode;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import org.firstinspires.ftc.teamcode.drive.Robot;
+
+@Autonomous(name = "AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored")
+public class AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored extends LinearOpMode {
+    @Override
+    public void runOpMode() throws InterruptedException {
+        Robot autoRobot = new Robot(hardwareMap);
+        waitForStart();
+        if (isStopRequested()) return;
+
+        //Setting initial position of robot on coordinate plane
+        Pose2d startPose = new Pose2d(-36, 72, Math.toRadians(270));
+        autoRobot.setPoseEstimate(startPose);
+
+        //Building Trajectories
+        Trajectory colorDetectTraj = autoRobot.trajectoryBuilder(startPose)
+                .forward(16.5)
+                .build();
+
+        Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                //.splineToSplineHeading(new Pose2d(-36, 12, Math.toRadians(330)), Math.toRadians(180))
+                .lineToLinearHeading(new Pose2d(-40, 12, Math.toRadians(330)))
+                .build();
+
+        Trajectory moveToCones = autoRobot.trajectoryBuilder(moveToStick.end())
+                .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                .build();
+
+        Trajectory returnToStick = autoRobot.trajectoryBuilder(moveToCones.end())
+                .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                .build();
+
+        Trajectory moveToQuadrant1 = autoRobot.trajectoryBuilder(returnToStick.end())
+                .splineToSplineHeading(new Pose2d(-60, 35, Math.toRadians(45)), Math.toRadians(0))
+                .build();
+
+        Trajectory moveToQuadrant2 = autoRobot.trajectoryBuilder(returnToStick.end())
+                .splineToSplineHeading(new Pose2d(-35, 35, Math.toRadians(45)), Math.toRadians(0))
+                .build();
+
+        Trajectory moveToQuadrant3 = autoRobot.trajectoryBuilder(returnToStick.end())
+                .splineToSplineHeading(new Pose2d(-13, 35, Math.toRadians(45)), Math.toRadians(0))
+                .build();
+
+
+                //Actions Begin
+            //Determining sleeve color and park value
+        autoRobot.followTrajectory(colorDetectTraj);
+        sleep(1000);
+        int parkValue = autoRobot.detectColor();
+        telemetry.addData("Color", parkValue);
+        telemetry.update();
+            //Placing preloaded element
+        autoRobot.followTrajectory(moveToStick);
+        //Might have to have a precision forward
+        //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
+            //Placing additional cones
+        for (int amtOfAdditionalCones = 1; amtOfAdditionalCones > 1; amtOfAdditionalCones++) {
+            autoRobot.followTrajectory(moveToCones);
+            //Might have to have a precision forward
+            //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
+            //Might have to use a range for liftToHeight instead because of the small height differences on a cone stack
+            autoRobot.followTrajectory(returnToStick);
+            //Might have to have a precision forward
+            //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
+        }
+        if (parkValue == 1) {
+            autoRobot.followTrajectory(moveToQuadrant1);
+        } else if (parkValue == 2) {
+            autoRobot.followTrajectory(moveToQuadrant2);
+        } else if (parkValue == 3) {
+            autoRobot.followTrajectory(moveToQuadrant3);
+        }
+    }
+}

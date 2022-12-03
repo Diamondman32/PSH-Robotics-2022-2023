@@ -27,43 +27,48 @@ public class AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored exte
                 .build();
 
         Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                //.splineToSplineHeading(new Pose2d(-36, 12, Math.toRadians(330)), Math.toRadians(180))
-                .lineToLinearHeading(new Pose2d(-40, 12, Math.toRadians(330)))
+                .lineToLinearHeading(new Pose2d(-35, 8, Math.toRadians(330))) //Better
+                //.splineToSplineHeading(new Pose2d(-8, 32, Math.toRadians(330)), Math.toRadians(0))
                 .build();
 
         Trajectory moveToCones = autoRobot.trajectoryBuilder(moveToStick.end())
-                .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-56, 10, Math.toRadians(175))) //It might roll over ground receptacle, if so, spline is better even if very weird
+                //.splineToSplineHeading(new Pose2d(-56, 10, Math.toRadians(175)), Math.toRadians(250))
                 .build();
 
         Trajectory returnToStick = autoRobot.trajectoryBuilder(moveToCones.end())
-                .lineToSplineHeading(new Pose2d(-70, 12, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(-35, 8, Math.toRadians(330))) //Same as above
+                //.splineToSplineHeading(new Pose2d(-35, 8, Math.toRadians(330)), Math.toRadians(250))
                 .build();
 
         Trajectory moveToQuadrant1 = autoRobot.trajectoryBuilder(returnToStick.end())
-                .splineToSplineHeading(new Pose2d(-60, 35, Math.toRadians(45)), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(-57, 11, Math.toRadians(180)))
+                //.splineToSplineHeading(new Pose2d(-57, 11, Math.toRadians(180)), Math.toRadians(250))
                 .build();
 
         Trajectory moveToQuadrant2 = autoRobot.trajectoryBuilder(returnToStick.end())
-                .splineToSplineHeading(new Pose2d(-35, 35, Math.toRadians(45)), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(-35, 11, Math.toRadians(180)))
+                //.splineToSplineHeading(new Pose2d(-35, 11, Math.toRadians(180)), Math.toRadians(0))
                 .build();
 
         Trajectory moveToQuadrant3 = autoRobot.trajectoryBuilder(returnToStick.end())
-                .splineToSplineHeading(new Pose2d(-13, 35, Math.toRadians(45)), Math.toRadians(0))
+                .lineToLinearHeading(new Pose2d(-14, 11, Math.toRadians(180))) //Should just skirt the pole
+                //.splineToSplineHeading(new Pose2d(-14, 11, Math.toRadians(180)), Math.toRadians(270))
                 .build();
 
 
-                //Actions Begin
-            //Determining sleeve color and park value
+        //Actions Begin
+        //Determining sleeve color and park value
         autoRobot.followTrajectory(colorDetectTraj);
         sleep(1000);
         int parkValue = autoRobot.detectColor();
         telemetry.addData("Color", parkValue);
         telemetry.update();
-            //Placing preloaded element
+        //Placing preloaded element
         autoRobot.followTrajectory(moveToStick);
         //Might have to have a precision forward
         //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
-            //Placing additional cones
+        //Placing additional cones
         for (int amtOfAdditionalCones = 1; amtOfAdditionalCones > 1; amtOfAdditionalCones++) {
             autoRobot.followTrajectory(moveToCones);
             //Might have to have a precision forward

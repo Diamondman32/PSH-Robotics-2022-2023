@@ -30,7 +30,8 @@ public class AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored exte
                 .lineToLinearHeading(new Pose2d(-35, 8, Math.toRadians(330))) //Better
                 //.splineToSplineHeading(new Pose2d(-8, 32, Math.toRadians(330)), Math.toRadians(0))
                 .build();
-
+                
+        //Nathan's was -70, 12
         Trajectory moveToCones = autoRobot.trajectoryBuilder(moveToStick.end())
                 .lineToLinearHeading(new Pose2d(-56, 10, Math.toRadians(175))) //It might roll over ground receptacle, if so, spline is better even if very weird
                 //.splineToSplineHeading(new Pose2d(-56, 10, Math.toRadians(175)), Math.toRadians(250))

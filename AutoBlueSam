@@ -70,7 +70,7 @@ public class AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored exte
         //Might have to have a precision forward
         //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
         //Placing additional cones
-        //for (int amtOfAdditionalCones = 1; amtOfAdditionalCones > 1; amtOfAdditionalCones++) {
+        for (int amtOfAdditionalCones = 1; amtOfAdditionalCones >= 1; amtOfAdditionalCones++) {
             autoRobot.followTrajectory(moveToCones);
             //Might have to have a precision forward
             //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
@@ -78,7 +78,7 @@ public class AClassOfBlueAutoRightBasedOffOfTheMeepMeepValuesBecauseImBored exte
             autoRobot.followTrajectory(returnToStick);
             //Might have to have a precision forward
             //ADD CODE TO ADJUST LIFT HEIGHT AND PLACE ELEMENT then lower lift
-        //}
+        }
         if (parkValue == 1) {
             autoRobot.followTrajectory(moveToQuadrant1);
         } else if (parkValue == 2) {

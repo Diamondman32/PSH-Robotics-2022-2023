@@ -1,0 +1,122 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+
+@Config
+@TeleOp(group = "drive")
+public class teletest  extends OpMode {
+    public DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    public Servo grabber;
+    public DcMotorEx liftMotorLeft;
+    public DcMotorEx liftMotorRight;
+    public ColorSensor colorSensor;
+    public DistanceSensor frontDistanceSensor;
+
+    public PIDController controller;
+    public static double p = 0.1, i = 0, d = 0;
+    public static double f = 0.1;
+    public static int armTarget = 50;
+    public final double ticks_in_degree_arm = 120 / 90.0;
+
+    public void init() {
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        leftRear.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+
+        //Initializing lift motor
+        controller = new PIDController(p, i, d);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        liftMotorRight = hardwareMap.get(DcMotorEx.class, "liftRight");
+        liftMotorRight.setDirection(DcMotor.Direction.FORWARD);
+        liftMotorLeft = hardwareMap.get(DcMotorEx.class, "liftLeft");
+        liftMotorLeft.setDirection(DcMotor.Direction.REVERSE);
+
+        //Initializing grabber
+        grabber = hardwareMap.servo.get("grabber");
+
+        //Initializing Color Sensor
+        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color");
+        frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistanceSensor");
+
+    }
+
+    public void loop(){
+        //CONTROLLER A (Driving Controller)
+        //Drive train
+        float yPosLeft01 = gamepad1.left_stick_y;
+        float yPosRight01 = gamepad1.right_stick_y;
+        boolean rightBumper1 = gamepad1.right_bumper;
+        boolean leftBumper1 = gamepad1.left_bumper;
+
+        if(rightBumper1) {
+            leftFront.setPower(0.75);
+            rightFront.setPower(-0.75);
+            leftRear.setPower(-0.75);
+            rightRear.setPower(0.75);
+        } else if(leftBumper1) {
+            leftFront.setPower(-0.75);
+            rightFront.setPower(0.75);
+            leftRear.setPower(0.75);
+            rightRear.setPower(-0.75);
+        } else {
+            leftFront.setPower(-yPosLeft01);
+            leftRear.setPower(-yPosLeft01);
+            rightFront.setPower(-yPosRight01);
+            rightRear.setPower(-yPosRight01);
+        }
+
+        //Lift
+        controller.setPID(p, i, d);
+        int armPos = liftMotorRight.getCurrentPosition();
+        double pid = controller.calculate(armPos, armTarget);
+        double ff = Math.cos(Math.toRadians(armTarget / ticks_in_degree_arm)) * f;
+        double power = pid + ff;
+        liftMotorRight.setPower(power);
+        liftMotorLeft.setPower(power);
+
+        if (gamepad1.x){
+            armTarget = 50;
+        }
+        if (gamepad1.a){
+            armTarget = 125;
+        }
+        if (gamepad1.b){
+            armTarget = 160;
+        }
+        if (gamepad1.y){
+            armTarget = 170;
+        }
+
+
+        //Grabber Code
+        if (gamepad2.right_bumper){
+            //open
+            grabber.setPosition(0.65);
+        }
+
+        if (gamepad2.left_bumper){
+            //closed
+            grabber.setPosition(1);
+        }
+        telemetry.addData("pos", armPos);
+        telemetry.addData("Target", armTarget);
+    }
+}
+

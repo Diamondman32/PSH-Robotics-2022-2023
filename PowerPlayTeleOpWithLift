@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -14,7 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @Config
 @TeleOp(group = "drive")
-public class teletest  extends OpMode {
+public class PowerPlayTeleOp  extends OpMode {
     public DcMotorEx leftFront, leftRear, rightRear, rightFront;
     public Servo grabber;
     public DcMotorEx liftMotorLeft;
@@ -64,7 +64,10 @@ public class teletest  extends OpMode {
         float yPosRight01 = gamepad1.right_stick_y;
         boolean rightBumper1 = gamepad1.right_bumper;
         boolean leftBumper1 = gamepad1.left_bumper;
-
+        int clawToggle1 = 0;
+        int clawToggle2 = 0;
+        double grabberPos = 0.5;
+        
         if(rightBumper1) {
             leftFront.setPower(0.75);
             rightFront.setPower(-0.75);
@@ -103,20 +106,19 @@ public class teletest  extends OpMode {
         if (gamepad1.y){
             armTarget = 170;
         }
-
-
-        //Grabber Code
-        if (gamepad2.right_bumper){
-            //open
-            grabber.setPosition(0.65);
-        }
-
-        if (gamepad2.left_bumper){
-            //closed
-            grabber.setPosition(1);
-        }
+        
+        //Grabber Adjuster
+     
+            if (gamepad2.dpad_right) {
+                grabberPos += 0.01;
+            }
+            if (gamepad2.dpad_left) {
+                grabberPos -= 0.01;
+            }
+            grabber.setPosition(grabberPos);
+            
+        telemetry.addData("Claw pos", grabberPos);
         telemetry.addData("pos", armPos);
         telemetry.addData("Target", armTarget);
     }
 }
-

@@ -18,7 +18,7 @@ public class AutoBlueSamV2 extends LinearOpMode {
         if (isStopRequested()) return;
 
         //Setting initial position of robot on coordinate plane
-        Pose2d startPose = new Pose2d(-36, 72, Math.toRadians(270));
+        Pose2d startPose = new Pose2d(-36, 63, Math.toRadians(270));
         autoRobot.setPoseEstimate(startPose);
 
         //Building Trajectories
@@ -26,6 +26,19 @@ public class AutoBlueSamV2 extends LinearOpMode {
                 .forward(16.5)
                 .build();
 
+        Trajectory goForward = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .forward(10)
+                .build();
+        Trajectory swerveRight = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-60, 36.5, Math.toRadians(180)))
+                .build();
+        Trajectory swerveMiddle = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-37, 36.5, Math.toRadians(180)))
+                .build();
+        Trajectory swerveLeft = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-12, 36.5, Math.toRadians(180)))
+                .build();
+        /*
         Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
                 .lineToLinearHeading(new Pose2d(-35, 8, Math.toRadians(330))) //Better
                 .build();
@@ -49,9 +62,26 @@ public class AutoBlueSamV2 extends LinearOpMode {
         Trajectory moveToQuadrant3 = autoRobot.trajectoryBuilder(returnToStick.end())
                 .splineToSplineHeading(new Pose2d(-14, 10, Math.toRadians(180)), Math.toRadians(270))
                 .build();
+        */
 
+        //                Actions Begin (EASY)
+        //Detect Color
+        autoRobot.followTrajectory(colorDetectTraj);
+        sleep(1000);
+        int parkValue = autoRobot.detectColor();
+        telemetry.addData("Color", parkValue);
+        telemetry.update();
+        autoRobot.followTrajectory(goForward);
+        if (parkValue == 1) {
+            autoRobot.followTrajectory(swerveRight);
+        } else if (parkValue == 2) {
+            autoRobot.followTrajectory(swerveMiddle);
+        } else if (parkValue == 3) {
+            autoRobot.followTrajectory(swerveLeft);
+        }
 
-        //Actions Begin
+/*
+        //                Actions Begin (HARD)
         //Determining sleeve color and park value
         autoRobot.followTrajectory(colorDetectTraj);
         sleep(1000);
@@ -79,5 +109,6 @@ public class AutoBlueSamV2 extends LinearOpMode {
         } else if (parkValue == 3) {
             autoRobot.followTrajectory(moveToQuadrant3);
         }
+ */
     }
 }

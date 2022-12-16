@@ -30,13 +30,19 @@ public class AutoBlueSamV2 extends LinearOpMode {
                 .forward(10)
                 .build();
         Trajectory swerveRight = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                .lineToLinearHeading(new Pose2d(-60, 36.5, Math.toRadians(180)))
-                .build();
-        Trajectory swerveMiddle = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                .lineToLinearHeading(new Pose2d(-37, 36.5, Math.toRadians(180)))
+                .strafeRight(25)
                 .build();
         Trajectory swerveLeft = autoRobot.trajectoryBuilder(colorDetectTraj.end())
-                .lineToLinearHeading(new Pose2d(-12, 36.5, Math.toRadians(180)))
+                .strafeLeft(25)
+                .build();
+        Trajectory turnRightQuad1 = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-60, 36.5, Math.toRadians(180)))
+                .build();
+        Trajectory turnRightQuad2 = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-37, 36.5, Math.toRadians(180)))
+                .build();
+        Trajectory turnRightQuad3 = autoRobot.trajectoryBuilder(colorDetectTraj.end())
+                .lineToLinearHeading(new Pose2d(-14, 36.5, Math.toRadians(180)))
                 .build();
         /*
         Trajectory moveToStick = autoRobot.trajectoryBuilder(colorDetectTraj.end())
@@ -74,10 +80,14 @@ public class AutoBlueSamV2 extends LinearOpMode {
         autoRobot.followTrajectory(goForward);
         if (parkValue == 1) {
             autoRobot.followTrajectory(swerveRight);
+            //autoRobot.followTrajectory(turnRightQuad1);
         } else if (parkValue == 2) {
-            autoRobot.followTrajectory(swerveMiddle);
+            //autoRobot.followTrajectory(turnRightQuad2);
+
         } else if (parkValue == 3) {
             autoRobot.followTrajectory(swerveLeft);
+            //autoRobot.followTrajectory(turnRightQuad3);
+
         }
 
 /*

@@ -1,0 +1,207 @@
+package org.firstinspires.ftc.teamcode.drive.opmode;
+
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@Config
+@TeleOp(group = "drive")
+public class PowerPlayTeleOp  extends OpMode {
+    public DcMotorEx leftFront, leftRear, rightRear, rightFront;
+    public DcMotor liftMotor;
+    public Servo grabber, chute, flip1, flip2;
+    public ColorSensor colorSensor;
+
+    private boolean grabberToggle = true;
+    private boolean chuteToggle = true;
+    public ElapsedTime grabTimer = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
+
+    /*
+    public PIDController controller;
+    public static double p = 0.1, i = 0, d = 0;
+    public static double f = 0.1;
+    public static int armTarget = 50;
+    public final double ticks_in_degree_arm = 120 / 90.0;
+     */
+
+    /*LIFT LEVEL MAP
+        0 = Cone Loading Position, Low Junction
+        1 = Medium Junction
+        2 = High Junction
+     */
+    private void liftToHeightEncoders(int level, double power) {
+        int liftValue = 0;
+        if (level == 0) {
+            liftValue = 0;
+        } else if (level == 1) {
+            liftValue = -1000;
+        } else if (level == 2) {
+            liftValue = -2230;
+        }
+
+        liftMotor.setTargetPosition(liftValue);
+        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        liftMotor.setPower(power);
+
+        while (liftMotor.isBusy()) {
+            telemetry.addData("Lift Encoder Position", liftMotor.getCurrentPosition());
+            telemetry.update();
+        }
+
+        liftMotor.setPower(0);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private int detectColor() {
+        int elementPosition = 0;
+        if (colorSensor.blue() > colorSensor.red() && colorSensor.blue() > colorSensor.green()) {
+            elementPosition = 1;
+        } else if (colorSensor.red() > colorSensor.blue() && colorSensor.red() > colorSensor.green()) {
+            elementPosition = 2;
+        } else if (colorSensor.green() > colorSensor.red() && colorSensor.green() > colorSensor.blue()) {
+            elementPosition = 3;
+        }
+        return elementPosition;
+    }
+
+    public void init() {
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftRear = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        leftRear.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+
+        //Lift Motor
+        liftMotor = hardwareMap.dcMotor.get("liftMotor");
+        liftMotor.setDirection(DcMotor.Direction.FORWARD);
+        liftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        /*
+        controller = new PIDController(p, i, d);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
+
+        liftMotorRight = hardwareMap.get(DcMotorEx.class, "liftRight");
+        liftMotorRight.setDirection(DcMotor.Direction.FORWARD);
+        liftMotorLeft = hardwareMap.get(DcMotorEx.class, "liftLeft");
+        liftMotorLeft.setDirection(DcMotor.Direction.REVERSE);
+         */
+
+        //Initializing grabber
+        grabber = hardwareMap.servo.get("grabber");
+        chute = hardwareMap.servo.get("chute");
+
+        //Initializing Flippers
+        flip1 = hardwareMap.servo.get("flip1");
+        flip1.setDirection(Servo.Direction.FORWARD);
+        flip2 = hardwareMap.servo.get("flip2");
+        flip2.setDirection(Servo.Direction.REVERSE);
+
+        //Initializing Color Sensor
+        colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
+    }
+
+    public void loop(){
+        //CONTROLLER A (Driving Controller)
+        //Drive train
+        float yPosLeft01 = gamepad1.left_stick_y;
+        float yPosRight01 = gamepad1.right_stick_y;
+        boolean rightBumper1 = gamepad1.right_bumper;
+        boolean leftBumper1 = gamepad1.left_bumper;
+
+        if(gamepad1.right_trigger > 0) {
+            leftFront.setPower(-gamepad1.right_trigger);
+            rightFront.setPower(gamepad1.right_trigger);
+            leftRear.setPower(gamepad1.right_trigger);
+            rightRear.setPower(-gamepad1.right_trigger);
+        } else if(gamepad1.left_trigger > 0) {
+            leftFront.setPower(gamepad1.right_trigger);
+            rightFront.setPower(-gamepad1.right_trigger);
+            leftRear.setPower(-gamepad1.right_trigger);
+            rightRear.setPower(gamepad1.right_trigger);
+        }else if(gamepad1.left_bumper) {
+            leftFront.setPower(gamepad1.left_stick_y*0.5);
+            leftRear.setPower(gamepad1.left_stick_y*0.5);
+            rightFront.setPower(gamepad1.right_stick_y*0.5);
+            rightRear.setPower(gamepad1.right_stick_y*0.5);
+        } else if(gamepad1.right_bumper) {
+            leftFront.setPower(gamepad1.left_stick_y*0.5);
+            leftRear.setPower(gamepad1.left_stick_y*0.5);
+            rightFront.setPower(gamepad1.right_stick_y*0.5);
+            rightRear.setPower(gamepad1.right_stick_y*0.5);
+        } else {
+            leftFront.setPower(-yPosLeft01);
+            leftRear.setPower(-yPosLeft01);
+            rightFront.setPower(-yPosRight01);
+            rightRear.setPower(-yPosRight01);
+        }
+
+        //Controller A
+        //Lift
+        if (gamepad1.a) {
+            liftToHeightEncoders(0, 0.75);
+        }
+        if (gamepad1.b) {
+            liftToHeightEncoders(1, 0.75);
+        }
+        if (gamepad1.y) {
+            liftToHeightEncoders(2, 0.75);
+        }
+
+        //Controller B
+        //Manual Lift
+        liftMotor.setPower(gamepad2.left_stick_y);
+
+        //Chute Controls
+        if (chuteToggle && gamepad2.dpad_up) {
+            chute.setPosition(0.94);
+            chuteToggle = false;
+        } else if (!chuteToggle && gamepad2.dpad_up) {
+            chute.setPosition(0.42);
+            chuteToggle = true;
+        }
+
+        //Flipper Controls
+        if (gamepad2.b) {
+            flip1.setPosition(0.965);
+            flip2.setPosition(0.965);
+        }
+
+        if (gamepad2.a) {
+            flip1.setPosition(0.518);
+            flip2.setPosition(0.518);
+        }
+
+        if (gamepad2.right_stick_y != 0) {
+            flip1.setPosition(flip1.getPosition() + -gamepad2.right_stick_y*0.007);
+            flip2.setPosition(flip2.getPosition() + -gamepad2.right_stick_y*0.007);
+        }
+
+        //Grabber Controls
+        if (grabberToggle && gamepad2.right_bumper && grabTimer.milliseconds()>750){
+            //open
+            grabber.setPosition(0.6);
+            grabberToggle = false;
+            grabTimer.reset();
+        } else if (!grabberToggle && gamepad2.right_bumper && grabTimer.milliseconds()>750) {
+            //closed
+            grabber.setPosition(0.4);
+            grabberToggle = true;
+            grabTimer.reset();
+            telemetry.addData("Timer", grabTimer.milliseconds());
+        }
+    }
+}

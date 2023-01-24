@@ -1,0 +1,21 @@
+private int liftValue = 0;
+
+private void liftToHeightEncoders(int level, double power) {
+        liftValue = 0;
+        if (level == 0) {
+            liftValue = 0;
+        } else if (level == 1) {
+            liftValue = -1000;
+        } else if (level == 2) {
+            liftValue = -2230;
+        }
+
+        liftMotor.setTargetPosition(liftValue);
+
+        liftMotor.setPower(power);
+    }
+    
+    //Stops the lift at the desired value
+        if (liftMotor.isBusy() && 5 > Math.abs(liftMotor.getCurrentPosition()-liftValue)) {
+            liftToHeightEncoders(-1, 0);//Level -1 doesn't change liftValue, sets power to 0
+        }

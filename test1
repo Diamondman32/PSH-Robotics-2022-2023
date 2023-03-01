@@ -1,0 +1,36 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+public class minBotTeleOp extends LinearOpMode {
+
+    public DcMotor leftFront, leftBack, rightFront, rightBack;
+
+    public void runOpMode()
+    {
+        leftFront = hardwareMap.dcMotor.get("motor1");
+        leftBack = hardwareMap.dcMotor.get("motor2");
+        rightFront = hardwareMap.dcMotor.get("motor3");
+        rightBack = hardwareMap.dcMotor.get("motor4");
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        waitForStart();
+        while (opModeIsActive())
+        {
+            leftFront.setPower(gamepad1.left_stick_x);
+            rightBack.setPower(gamepad1.left_stick_x);
+            leftBack.setPower(gamepad1.left_stick_y);
+            rightFront.setPower(gamepad1.left_stick_y);
+        }
+    }
+
+
+}

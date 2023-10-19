@@ -1,0 +1,64 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+@TeleOp(group = "drive")
+public class MiniBotCode extends OpMode {
+    public DcMotor liftMotor, leftFront, rightFront, leftBack, rightBack;
+
+    public void init() 
+    {
+        //Drive Motors
+        leftFront = hardwareMap.get(DcMotorEx.class, "leftFront");
+        leftBack = hardwareMap.get(DcMotorEx.class, "leftRear");
+        rightBack = hardwareMap.get(DcMotorEx.class, "rightRear");
+        rightFront = hardwareMap.get(DcMotorEx.class, "rightFront");
+        liftMotor = hardwareMap.get(DcMotorEx.class, "liftMotor");
+        leftFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void loop() 
+    {
+        //Controller A: Driving Controler
+        //Bumpers strafe left and right respectively
+        //Left and right stick position correspond to left and right drive power
+        
+        while (gamepad1.left_stick_y>0.2||gamepad1.left_stick_x>0.2||gamepad1.left_stick_y<-0.2
+        ||gamepad1.left_stick_x<-0.2) // Diagonal Drive
+        {
+        leftFront.setPower(gamepad1.left_stick_y*0.5); //0 Back Right
+        rightBack.setPower(gamepad1.left_stick_y); //3 Front Left
+        leftBack.setPower(gamepad1.left_stick_x*.75); //2 Front Right
+        rightFront.setPower(-gamepad1.left_stick_x); //1 Back Left
+        } 
+        leftFront.setPower(gamepad1.right_stick_x); //Turn
+        rightBack.setPower(-gamepad1.right_stick_x);
+        leftBack.setPower(gamepad1.right_stick_x);
+        rightFront.setPower(gamepad1.right_stick_x);
+        
+        while (gamepad1.left_bumper){
+            leftFront.setPower(0.25); //Turn
+            rightBack.setPower(-1);
+            leftBack.setPower(-0.8);
+            rightFront.setPower(-0.4);
+        }
+    }
+    
+    
+    
+}

@@ -1,0 +1,37 @@
+package org.firstinspires.ftc.teamcode.drive;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
+@TeleOp(name="Power Play TeleOp",group=" ")
+public class driveTest extends OpMode {
+    private DcMotor tl, tr, bl, br;
+    private boolean is_on;
+    public driveTest(int speed, boolean on) {
+        on = is_on;
+    }
+    private void tom() {
+    }
+    public void init() {
+        tl = hardwareMap.get(DcMotorEx.class, "leftFront");
+        tr = hardwareMap.get(DcMotorEx.class, "leftRear");
+        bl = hardwareMap.get(DcMotorEx.class, "rightRear");
+        br = hardwareMap.get(DcMotorEx.class, "rightFront");
+    }
+    public void loop(){
+        float yPosLeft01 = gamepad1.left_stick_y;
+        float yPosRight01 = gamepad1.right_stick_y;
+        //drive();
+
+        tl.setPower(yPosLeft01);
+        br.setPower(yPosLeft01);
+        tr.setPower(-yPosLeft01);
+        bl.setPower(-yPosLeft01);
+        //drive(5);
+        //drive(25);
+        //drive(100);
+    }
+
+}
